@@ -6,11 +6,28 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Claus Rasmussen"]
   spec.email         = ["claus.l.rasmussen@gmail.com"]
 
-  spec.summary       = %q{constrain gem}
-  spec.description   = %q{constrain gem}
+  spec.summary       = %q{Dynamic in-file type checking}
+  spec.description   = %q{
+    Allows you check if an object match a class expression. It is typically
+    used to check the type of method paraameters. It is an alternative to using
+    Ruby-3 .rbs files but with a different syntax and only dynamic checks
+    
+    Typically you'll include the Constrain module and use #constrain to check
+    the type of method parameters:
+
+      include Constrain
+
+      # f takes a String and an array of Integer objects. Raise a Constrain::Error
+      # if parameters doesn't have the expected types
+      def f(a, b)
+        constrain a, String
+        constrain b, [Integer]
+      end
+
+    Constrain works with ruby-2 (and maybe ruby-3)
+  }
   spec.homepage      = "http://www.nowhere.com/"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
-
 
   spec.metadata["homepage_uri"] = spec.homepage
 
@@ -22,4 +39,9 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
+
+  # spec.add_dependency GEM [, VERSION]
+
+  # spec.add_development_dependency GEM [, VERSION]
+  spec.add_development_dependency "simplecov"
 end
