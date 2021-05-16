@@ -29,6 +29,7 @@ describe "Constrain" do
   let(:float) { 1.2 }
   let(:int) { 42 }
   let(:another_int) { 43 }
+  let(:msg) { "Message" }
 
   it 'has a version number' do
     expect(Constrain::VERSION).not_to be_nil
@@ -48,7 +49,18 @@ describe "Constrain" do
 
     context "when given a non-matching type" do
       it "raises a Constrain::TypeError exception" do
-        expect { constrain(true, Integer) }.to  raise_error Constrain::TypeError
+        expect { constrain(true, Integer) }.to raise_error Constrain::TypeError
+      end
+    end
+
+    context "when given the optional msg argument" do
+      it "uses that as the error message for TypeError exceptions" do
+        expect { constrain(true, Integer, msg) }.to raise_error Constrain::TypeError, msg
+      end
+      it "ignores it for Error exceptions" do
+        expect { constrain(true, msg) }.to raise_error(Constrain::Error) { |args|
+          args.message != msg
+        }
       end
     end
   end

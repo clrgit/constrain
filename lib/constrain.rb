@@ -6,8 +6,8 @@ module Constrain
 
   # Raised if types doesn't match a class expression
   class TypeError < Error
-    def initialize(value, exprs)
-      super "Expected #{value.inspect} to match #{Constrain.fmt_exprs(exprs)}"
+    def initialize(value, exprs, msg = nil)
+      super msg || "Expected #{value.inspect} to match #{Constrain.fmt_exprs(exprs)}"
     end
   end
 
@@ -15,10 +15,14 @@ module Constrain
   # Constrain::Error if the expression is invalid and a Constrain::TypeError if
   # the value doesn't match
   def constrain(value, *exprs)
-    return if exprs.any? { |expr| Constrain.check(value, expr) }
-    error = TypeError.new(value, exprs)
-    error.set_backtrace(caller[1..-1])
-    raise error
+    msg = exprs.pop if exprs.last.is_a?(String)
+    begin
+      !exprs.empty? or raise Error, "Empty class expression"
+      exprs.any? { |expr| Constrain.check(value, expr) } or raise TypeError.new(value, exprs, msg)
+    rescue Error => ex
+      ex.set_backtrace(caller[1..-1])
+      raise
+    end
   end
 
   # Return true if the value matches the class expression. Raises a
