@@ -65,7 +65,7 @@ module Constrain
   #
   def self.fmt_expr(expr)
     case expr
-      when Class; expr.to_s
+      when Class, Module; expr.to_s
       when Array; "[" + expr.map { |expr| fmt_expr(expr) }.join(", ") + "]"
       when Hash; "{" + expr.map { |k,v| "#{fmt_expr(k)} => #{fmt_expr(v)}" }.join(", ") + "}"
       when Proc; "Proc@#{expr.source_location.first}:#{expr.source_location.last}"
