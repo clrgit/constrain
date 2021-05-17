@@ -84,12 +84,13 @@ or false as result
 ## Class Expressions
 
 Constrain#constrain and Constrain::check use class expressions composed of
-Class objects, Proc objects, or arrays and hashes of class expressions. Class
-objects match if the value is an instance of the class:
+class or module objects, Proc objects, or arrays and hashes of class expressions. Class or module
+objects match if `value.is_a?(class_or_module)` returns true:
 
 ```ruby
-constrain 42, Integer   # Success
-constrain 42, String    # Failure
+constrain 42, Integer         # Success
+constrain 42, Comparable      # Success
+constrain nil, Comparable     # Failure
 ```
 
 More than one class expression is allowed. It matches if at least one of the expressions match:

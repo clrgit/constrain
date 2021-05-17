@@ -29,7 +29,7 @@ module Constrain
   # Constrain::Error if the expression is invalid
   def self.check(value, expr)
     case expr
-      when Class
+      when Class, Module
         value.is_a?(expr)
       when Array
         !expr.empty? or raise Error, "Empty array"

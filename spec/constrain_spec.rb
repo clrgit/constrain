@@ -86,9 +86,13 @@ describe "Constrain" do
       end
 
       describe "an expr" do
-        it "accepts a CLASS literal" do
+        it "accepts a Class object" do
           accept(int, Integer)
           reject(str, Integer)
+        end
+        it "accepts a Module object" do
+          accept(int, Comparable)
+          reject(nil, Comparable)
         end
         it "accepts an array" do
           accept [int, another_int], [Integer]
@@ -173,6 +177,7 @@ describe "Constrain" do
           reject [str], lambda { |val| val.is_a?(Symbol) }
         end
       end
+
     end
 
     context "when given an illegal expression" do
