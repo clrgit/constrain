@@ -123,6 +123,11 @@ describe "Constrain" do
           accept [str], [Integer, String]
           reject [float], [Integer, String]
         end
+        it "accepts an empty array" do
+          accept [], [Integer]
+          accept [], [[Integer]]
+          accept [[]], [[Integer]]
+        end
       end
 
       describe "a hash" do
