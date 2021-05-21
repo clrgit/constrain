@@ -60,26 +60,25 @@ end
 The alternative is to include the constrain Module in a common root class to
 have it available in all child class
 
-The #constrain method has the following signature
+## Methods
 
-```ruby
-constrain(value, *class-expressions, message = nil)
-```
+#### constrain(value, \*class-expressions, message = nil, unwind: 0)
 
-It checks that the value matches at least one of the class-expressions
-and raise a Constrain::TypeError if not. The error message can be customized by
-added the message argument. #constrain also raise a Constrain::Error exception
-if there is an error in the class expression. It is typically used to
-type-check parameters in methods
+Check that the value matches at least one of the class-expressions and
+raise a Constrain::TypeError if not. The error message can be customized by
+added the message argument and a number of backtrace leves can be skipped by
+setting :unwind option. By default the backtrace will refer to the call of #constrain
+\#constrain also raises a Constrain::Error exception if there is an error
+in the syntax of the class expression
 
-Constrain also defines a #check class method with the signature
+\#constrain is typically used to type-check parameters in methods where you
+want an exception if the parameters doesn't match the expected
 
-```ruby
-Constrain.check(value, *class-expression) -> true or false
-```
+
+#### Constrain.check(value, \*class-expression) -> true or false
 
 It matches value against the class expressions like #constrain but returns true
-or false as result
+or false as result and can be used to handle complex type expressions dynamically 
 
 ## Class Expressions
 

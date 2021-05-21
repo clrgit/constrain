@@ -63,6 +63,25 @@ describe "Constrain" do
         }
       end
     end
+
+    context "when raising a TypeError" do
+      it "the stack trace refers to the location of the call to #constrain" do
+        lineno = nil
+        expect { 
+          lineno = __LINE__; constrain str, Integer # On one line!
+        }.to raise_error { |e|
+          expect(e.backtrace[0]).to match /^#{__FILE__}:#{lineno}:/
+        }
+      end
+      it "skips :unwind levels of stack trace" do
+        backtrace = nil
+        expect { 
+          backtrace = caller; constrain str, Integer, unwind: 1 # On one line!
+        }.to raise_error { |e|
+          expect(e.backtrace[0]).to eq backtrace[0]
+        }
+      end
+    end
   end
 
   describe "::check" do
