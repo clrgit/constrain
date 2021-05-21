@@ -75,14 +75,16 @@ in the syntax of the class expression
 want an exception if the parameters doesn't match the expected
 
 
-#### Constrain.check(value, \*class-expression) -> true or false
+#### Constrain.constrain?(value, \*class-expression) -> true or false
 
 It matches value against the class expressions like #constrain but returns true
-or false as result and can be used to handle complex type expressions dynamically 
+or false as result and can be used to handle complex type expressions
+dynamically. It is made a class method to minimize namespace pollution
+
 
 ## Class Expressions
 
-Constrain#constrain and Constrain::check use class expressions composed of
+Constrain#constrain and Constrain::constrain? use class expressions composed of
 class or module objects, Proc objects, or arrays and hashes of class expressions. Class or module
 objects match if `value.is_a?(class_or_module)` returns true:
 

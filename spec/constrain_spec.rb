@@ -84,15 +84,15 @@ describe "Constrain" do
     end
   end
 
-  describe "::check" do
+  describe "::constrain?" do
     it "expects a non-empty expr" do
       reject(str)
       reject(str, [])
     end
 
     it "returns true if the value match the class expression" do
-      expect(Constrain.check int, Integer).to eq true
-      expect(Constrain.check str, Integer).to eq false
+      expect(Constrain.constrain? int, Integer).to eq true
+      expect(Constrain.constrain? str, Integer).to eq false
     end
 
     context "when parsing" do
@@ -206,7 +206,7 @@ describe "Constrain" do
 
     context "when given an illegal expression" do
       it "raises a Constrain::Error" do
-        expect { Constrain.check int, int }.to raise_error Constrain::Error
+        expect { Constrain.constrain? int, int }.to raise_error Constrain::Error
       end
     end
   end
