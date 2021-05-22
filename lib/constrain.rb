@@ -11,10 +11,19 @@ module Constrain
     end
   end
 
+  # :call-seq:
+  #   constrain(value, *class-expressions, unwind: 0)
+  #
   # Check that value matches one of the class expressions. Raises a
   # Constrain::Error if the expression is invalid and a Constrain::TypeError if
   # the value doesn't match. The exception's backtrace skips :unwind number of entries
-  def constrain(value, *exprs, unwind: 0)
+  def constrain(value, *exprs) #, unwind: 0)
+    if exprs.last.is_a?(Hash)
+      unwind = exprs.last.delete(:unwind) || 0
+      !exprs.last.empty? or exprs.pop
+    else
+      unwind = 0
+    end
     msg = exprs.pop if exprs.last.is_a?(String)
     begin
       !exprs.empty? or raise Error, "Empty class expression"

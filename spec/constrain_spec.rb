@@ -41,6 +41,12 @@ describe "Constrain" do
       accept(int, Integer, String)
     end
 
+    it "accepts a :unwind option" do
+      accept int, Integer, unwind: 2
+      accept({int => str}, Integer => String, unwind: 2)
+      accept int, Integer, Integer => String, unwind: 2
+    end
+
     context "when sucessful" do
       it "returns the value" do
         expect(constrain(42, Integer)).to eq 42
