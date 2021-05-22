@@ -41,6 +41,12 @@ describe "Constrain" do
       accept(int, Integer, String)
     end
 
+    context "when sucessful" do
+      it "returns the value" do
+        expect(constrain(42, Integer)).to eq 42
+      end
+    end
+
     context "when given an illegal expr" do
       it "raises a Constrain::Error exception" do
         expect { constrain(true, true) }.to raise_error Constrain::Error

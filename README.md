@@ -64,15 +64,18 @@ have it available in all child class
 
 #### constrain(value, \*class-expressions, message = nil, unwind: 0)
 
-Check that the value matches at least one of the class-expressions and
-raise a Constrain::TypeError if not. The error message can be customized by
-added the message argument and a number of backtrace leves can be skipped by
-setting :unwind option. By default the backtrace will refer to the call of #constrain
-\#constrain also raises a Constrain::Error exception if there is an error
-in the syntax of the class expression
+Return the given value if it matches at least one of the class-expressions and raise a
+Constrain::TypeError if not. The error message can be customized by added the
+message argument and a number of backtrace leves can be skipped by setting
+:unwind option. By default the backtrace will refer to the point of the call of
+\#constrain. \#constrain araises a Constrain::Error exception if there is
+an error in the syntax of the class expression
 
 \#constrain is typically used to type-check parameters in methods where you
-want an exception if the parameters doesn't match the expected
+want an exception if the parameters doesn't match the expected, but because it
+returns the value if successful it can be used to check the validity of
+variables in expressions too, eg. `return constrain(result_of_complex_computation, Integer)` 
+to check the return value of a method
 
 
 #### Constrain.constrain?(value, \*class-expression) -> true or false
