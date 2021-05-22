@@ -139,10 +139,15 @@ constrain 0, Integer                          # Success
 constrain 0, lambda { |value| value > 1 }     # Failure
 ```
 
-Proc objects can check every aspect of an object but you should not overuse it
-because as checks becomes more complex they tend to include business logic that
-should be kept in the production code. Constrain is only thouhgt of as a tool
-to catch developer errors - not errors that stem from corrupted data
+Proc objects are a little more verbose than checking the constraint without
+\#constrain but it allows the use of the :unwind option to manipulate the
+apparent origin in the source of the exception
+
+Note that even though Proc objects can check every aspect of an object but you
+should not overuse it because as checks becomes more complex they tend to
+include business logic that should be kept in the production code. Constrain is
+only thouhgt of as a tool to catch developer errors - not errors that stem from
+corrupted data
 
 #### Arrays
 
