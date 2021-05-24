@@ -1,4 +1,3 @@
-include Constrain
 
 def accept(value, *expr)
   begin
@@ -24,6 +23,8 @@ def reject(value, *expr)
 end
 
 describe "Constrain" do
+  include Constrain
+
   let(:str) { "str" }
   let(:sym) { :sym }
   let(:float) { 1.2 }
@@ -34,6 +35,7 @@ describe "Constrain" do
   it 'has a version number' do
     expect(Constrain::VERSION).not_to be_nil
   end
+
 
   describe "#constrain" do
     it "accepts a sequence of class expressions" do
@@ -247,6 +249,40 @@ describe "Constrain" do
         expect { Constrain.fmt_expr(int) }.to raise_error Constrain::Error
       end
     end
+  end
+end
+
+describe "including Constrain" do
+  it "defines constrain as a instance method" do
+    klass = Class.new {
+      include Constrain
+      def f(int)
+        constrain int, Integer
+      end
+    }
+    expect { klass.new.f(42) }.not_to raise_error
+    expect { klass.new.f("str") }.to raise_error Constrain::TypeError
+  end
+  it "defines constrain as a class method" do
+    klass = Class.new {
+      include Constrain
+      def self.f(int)
+        constrain int, Integer
+      end
+    }
+    expect { klass.f(42) }.not_to raise_error
+    expect { klass.f("str") }.to raise_error Constrain::TypeError
+  end
+
+  it "defines constrain? as a class method" do
+    klass = Class.new {
+      include Constrain
+      def self.f(int)
+        constrain? int, Integer
+      end
+    }
+    expect(klass.f(42)).to eq true
+    expect(klass.f("str")).to eq false
   end
 end
 

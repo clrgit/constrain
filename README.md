@@ -58,7 +58,7 @@ end
 ```
 
 The alternative is to include the constrain Module in a common root class to
-have it available in all child class
+have it available in all child classes
 
 ## Methods
 
@@ -68,7 +68,7 @@ Return the given value if it matches at least one of the class-expressions and r
 Constrain::TypeError if not. The error message can be customized by added the
 message argument and a number of backtrace leves can be skipped by setting
 :unwind option. By default the backtrace will refer to the point of the call of
-\#constrain. \#constrain araises a Constrain::Error exception if there is
+\#constrain. \#constrain raises a Constrain::Error exception if there is
 an error in the syntax of the class expression
 
 \#constrain is typically used to type-check parameters in methods where you
@@ -77,13 +77,19 @@ returns the value if successful it can be used to check the validity of
 variables in expressions too, eg. `return constrain(result_of_complex_computation, Integer)` 
 to check the return value of a method
 
+#### Constrain.constrain(value, \*class-expressions, message = nil, unwind: 0)
+
+Class method version of #constrain. It is automatically added to classes that
+include Constrain
+
 
 #### Constrain.constrain?(value, \*class-expression) -> true or false
 
 It matches value against the class expressions like #constrain but returns true
 or false as result and can be used to handle complex type expressions
-dynamically. It is made a class method to minimize namespace pollution
-
+dynamically. It is automatically added to classes that include Constrain.
+Constrain.constrain? raises a Constrain::Error exception if there is an error
+in the syntax of the class expression
 
 ## Class Expressions
 
