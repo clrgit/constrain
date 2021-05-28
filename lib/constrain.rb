@@ -1,18 +1,4 @@
 require "constrain/version"
-module Foo
-
-  module InstanceMethods
-    def bar1
-      'bar1'
-    end
-  end
-
-  module ClassMethods
-    def bar2
-      'bar2'
-    end
-  end
-end
 
 module Constrain
   # Raised on any error

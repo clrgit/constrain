@@ -1,5 +1,6 @@
 
 o Class | Class syntax
 o attr_reader :variable, ClassExpr
+o 'constrain arg, :one_value, :another_value, 1, 2, 3'
 
 + constrain value, class-expr, "Error message"
