@@ -5,7 +5,7 @@ module Constrain
   class Error < StandardError; end
 
   # Raised if types doesn't match a class expression
-  class TypeError < Error
+  class MatchError < Error
     def initialize(value, exprs, msg = nil, unwind: 0)
       super msg || "Expected #{value.inspect} to match #{Constrain.fmt_exprs(exprs)}"
     end
@@ -20,15 +20,18 @@ module Constrain
     Constrain.do_constrain(value, *exprs)
   end
 
+  # Like #constrain but returns true/false to indicate the result instead of
+  # raising an exception
   def constrain?(value, expr)
     Constrain.do_constrain?(value, expr)
   end
 
   # :call-seq:
   #   constrain(value, *class-expressions, unwind: 0)
+  #   constrain(value, *values, unwind: 0)
   #
   # Check that value matches one of the class expressions. Raises a
-  # Constrain::Error if the expression is invalid and a Constrain::TypeError if
+  # Constrain::Error if the expression is invalid and a Constrain::MatchError if
   # the value doesn't match. The exception's backtrace skips :unwind number of
   # entries
   def self.constrain(value, *exprs)
@@ -65,7 +68,7 @@ module Constrain
     begin
       !exprs.empty? or raise Error, "Empty class expression"
       exprs.any? { |expr| Constrain.do_constrain?(value, expr) } or 
-          raise TypeError.new(value, exprs, msg, unwind: unwind)
+          raise MatchError.new(value, exprs, msg, unwind: unwind)
     rescue Error => ex
       ex.set_backtrace(caller[1 + unwind..-1])
       raise
@@ -95,7 +98,7 @@ module Constrain
       when Proc
         expr.call(value)
     else
-      raise Error, "Illegal expression #{expr.inspect}"
+      expr === value
     end
   end
 
@@ -112,11 +115,12 @@ module Constrain
   def self.fmt_expr(expr)
     case expr
       when Class, Module; expr.to_s
+      when Regexp; expr.to_s
       when Array; "[" + expr.map { |expr| fmt_expr(expr) }.join(", ") + "]"
       when Hash; "{" + expr.map { |k,v| "#{fmt_expr(k)} => #{fmt_expr(v)}" }.join(", ") + "}"
       when Proc; "Proc@#{expr.source_location.first}:#{expr.source_location.last}"
     else
-      raise Error, "Illegal expression"
+      raise Error, "Illegal expression: #{expr.inspect}"
     end
   end
 end

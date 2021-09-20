@@ -4,7 +4,7 @@ def accept(value, *expr)
     constrain(value, *expr)
     expect(true).to eq true
     # :nocov:
-  rescue TypeError => ex
+  rescue Constrain::MatchError => ex
     expect(false).to(eq(true), ex.message)
     # :nocov:
   end
@@ -43,6 +43,23 @@ describe "Constrain" do
       accept(int, Integer, String)
     end
 
+    it "accepts a sequence of simple values" do
+      accept(:yellow, :red, :yellow, :green)
+      reject(:blue, :red, :yellow, :green)
+    end
+
+    it "accepts regular expressions as simple values" do
+      # https://stackoverflow.com/a/719543
+      email_regexp = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
+      accept("noone@nowhere.com", email_regexp)
+      reject("noone@@nowhere.com", email_regexp)
+    end
+
+    it "accepts a sequence of class expressions or simple values" do
+      accept(42, :red, :yellow, :green, Integer)
+      reject(42.0, :red, :yellow, :green, Integer)
+    end
+
     it "accepts a :unwind option" do
       accept int, Integer, unwind: 2
       accept({int => str}, Integer => String, unwind: 2)
@@ -55,21 +72,21 @@ describe "Constrain" do
       end
     end
 
-    context "when given an illegal expr" do
+    context "when unsuccessful" do
       it "raises a Constrain::Error exception" do
-        expect { constrain(true, true) }.to raise_error Constrain::Error
+        expect { constrain(42, "42") }.to raise_error Constrain::Error
       end
     end
 
     context "when given a non-matching type" do
-      it "raises a Constrain::TypeError exception" do
-        expect { constrain(true, Integer) }.to raise_error Constrain::TypeError
+      it "raises a Constrain::MatchError exception" do
+        expect { constrain(true, Integer) }.to raise_error Constrain::MatchError
       end
     end
 
     context "when given the optional msg argument" do
-      it "uses that as the error message for TypeError exceptions" do
-        expect { constrain(true, Integer, msg) }.to raise_error Constrain::TypeError, msg
+      it "uses that as the error message for MatchError exceptions" do
+        expect { constrain(true, Integer, msg) }.to raise_error Constrain::MatchError, msg
       end
       it "ignores it for Error exceptions" do
         expect { constrain(true, msg) }.to raise_error(Constrain::Error) { |args|
@@ -78,7 +95,7 @@ describe "Constrain" do
       end
     end
 
-    context "when raising a TypeError" do
+    context "when raising a MatchError" do
       it "the stack trace refers to the location of the call to #constrain" do
         lineno = nil
         expect { 
@@ -106,15 +123,29 @@ describe "Constrain" do
 
     it "returns true if the value match the class expression" do
       expect(Constrain.constrain? int, Integer).to eq true
-      expect(Constrain.constrain? str, Integer).to eq false
     end
+
+    it "returns false if the value doesn't match the expression" do
+      expect(Constrain.constrain? 42, "42").to eq false
+    end
+
+    context "when unsuccessful" do
+      it "raises a Constrain::Error exception" do
+        expect { constrain(42, "42") }.to raise_error Constrain::Error
+      end
+    end
+
 
     context "when parsing" do
       describe "a list" do
-        it "accepts a sequence of at least two class-exprs" do
+        it "accepts a sequence of at least two exprs" do
           accept(int, Integer, String)
           accept(str, Integer, String)
           reject(str, [Integer, String])
+        end
+        it "accepts a list of values" do
+          accept(:yellow, :red, :yellow, :green)
+          reject(:blue, :red, :yellow, :green)
         end
       end
 
@@ -218,11 +249,6 @@ describe "Constrain" do
 
     end
 
-    context "when given an illegal expression" do
-      it "raises a Constrain::Error" do
-        expect { Constrain.constrain? int, int }.to raise_error Constrain::Error
-      end
-    end
   end
 
   describe "::fmt_exprs" do
@@ -261,7 +287,7 @@ describe "including Constrain" do
       end
     }
     expect { klass.new.f(42) }.not_to raise_error
-    expect { klass.new.f("str") }.to raise_error Constrain::TypeError
+    expect { klass.new.f("str") }.to raise_error Constrain::MatchError
   end
   it "defines constrain as a class method" do
     klass = Class.new {
@@ -271,7 +297,7 @@ describe "including Constrain" do
       end
     }
     expect { klass.f(42) }.not_to raise_error
-    expect { klass.f("str") }.to raise_error Constrain::TypeError
+    expect { klass.f("str") }.to raise_error Constrain::MatchError
   end
 
   it "defines constrain? as a class method" do
