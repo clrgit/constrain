@@ -117,7 +117,7 @@ describe "Constrain" do
 
   describe "#constrain?" do
     it "returns true if the constraint matches the given value" do
-      expect(constrain? 3, Integer).to eq true
+      expect(constrain? 3, Integer, String).to eq true
       expect(constrain? 3, String).to eq false
     end
     

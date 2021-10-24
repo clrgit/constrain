@@ -22,8 +22,8 @@ module Constrain
 
   # Like #constrain but returns true/false to indicate the result instead of
   # raising an exception
-  def constrain?(value, expr)
-    Constrain.do_constrain?(value, expr)
+  def constrain?(value, *exprs)
+    Constrain.do_constrain?(value, *exprs)
   end
 
   # :call-seq:
@@ -40,8 +40,8 @@ module Constrain
 
   # Return true if the value matches the class expression. Raises a
   # Constrain::Error if the expression is invalid
-  def self.constrain?(value, expr)
-    do_constrain?(value, expr)
+  def self.constrain?(value, *exprs)
+    do_constrain?(value, *exprs)
   end
 
   module ClassMethods
