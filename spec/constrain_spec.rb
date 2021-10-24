@@ -50,7 +50,7 @@ describe "Constrain" do
 
     it "accepts regular expressions as simple values" do
       # https://stackoverflow.com/a/719543
-      email_regexp = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
+      email_regexp = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9.-]+$/
       accept("noone@nowhere.com", email_regexp)
       reject("noone@@nowhere.com", email_regexp)
     end
@@ -115,14 +115,28 @@ describe "Constrain" do
     end
   end
 
-  describe "::constrain?" do
+  describe "#constrain?" do
+    it "returns true if the constraint matches the given value" do
+      expect(constrain? 3, Integer).to eq true
+      expect(constrain? 3, String).to eq false
+    end
+    
+    context "when given an illegal expr" do
+      it "raises a Constrain::Error exception" do
+        expect { constrain?(true, []) }.to raise_error Constrain::Error
+      end
+    end
+  end
+
+  describe "::do_constrain_value?" do
     it "expects a non-empty expr" do
       reject(str)
       reject(str, [])
     end
 
     it "returns true if the value match the class expression" do
-      expect(Constrain.constrain? int, Integer).to eq true
+      expect(Constrain.do_constrain_value? int, Integer).to eq true
+      expect(Constrain.do_constrain_value? str, Integer).to eq false
     end
 
     it "returns false if the value doesn't match the expression" do
@@ -247,8 +261,12 @@ describe "Constrain" do
         end
       end
 
+      context "an illegal expression" do
+        it "raises a Constrain::Error" do
+          expect { Constrain.do_constrain_value? int, [] }.to raise_error Constrain::Error
+        end
+      end
     end
-
   end
 
   describe "::fmt_exprs" do

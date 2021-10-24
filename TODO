@@ -1,6 +1,9 @@
 
+o A tuple method: "Symbol => constrain.tuple(String, Integer)"
+o An array and hash method: "Symbol => constrain.array(Integer), String => constrain.hash(Symbol, Integer)"
 o Class | Class syntax
-o attr_reader :variable, ClassExpr
-o 'constrain arg, :one_value, :another_value, 1, 2, 3'
+o Constrained attributes: constrain_reader, constrain_writer, constrain_accessor: 
+o Messages should include info about the unexpected element type in arrays (and maybe more): "Expected [#<PgGraph::Data::Record:public.pings[1] {id: 1, name: 'Ping A'}>, #<PgGraph::Data::Record:public.pings[2] {id: 2, name: 'Ping B'}>, nil] to match [PgGraph::Data::Record]
 
 + constrain value, class-expr, "Error message"
++ Check against values: 'constrain arg, :one_value, :another_value, 1, 2, 3'

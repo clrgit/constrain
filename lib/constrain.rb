@@ -40,8 +40,6 @@ module Constrain
 
   # Return true if the value matches the class expression. Raises a
   # Constrain::Error if the expression is invalid
-  #
-  # TODO: Allow *exprs
   def self.constrain?(value, expr)
     do_constrain?(value, expr)
   end
@@ -65,9 +63,10 @@ module Constrain
       unwind = 1
     end
     msg = exprs.pop if exprs.last.is_a?(String)
+    
     begin
-      !exprs.empty? or raise Error, "Empty class expression"
-      exprs.any? { |expr| Constrain.do_constrain?(value, expr) } or 
+      !exprs.empty? or raise Error, "Empty constraint"
+      exprs.any? { |expr| Constrain.do_constrain_value?(value, expr) } or 
           raise MatchError.new(value, exprs, msg, unwind: unwind)
     rescue Error => ex
       ex.set_backtrace(caller[1 + unwind..-1])
@@ -76,12 +75,19 @@ module Constrain
     value
   end
 
-  def self.do_constrain?(value, expr)
+  def self.do_constrain?(value, *exprs)
+    begin
+      !exprs.empty? or raise Error, "Empty constraint"
+      exprs.any? { |expr| Constrain.do_constrain_value?(value, expr) }
+    end
+  end
+
+  def self.do_constrain_value?(value, expr)
     case expr
       when Class, Module
         value.is_a?(expr)
       when Array
-        !expr.empty? or raise Error, "Empty array"
+        !expr.empty? or raise Error, "Empty array in constraint"
         value.is_a?(Array) && value.all? { |elem| expr.any? { |e| Constrain.constrain?(elem, e) } }
       when Hash
         value.is_a?(Hash) && value.all? { |key, value|

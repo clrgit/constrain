@@ -104,7 +104,7 @@ means you can use regular expressions too:
 
 ```ruby
 # Simple email regular expression (https://stackoverflow.com/a/719543)
-EMAIL_RE = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
+EMAIL_RE = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9.-]+$/
 
 def email(address)
   constrain address, EMAIL_RE
