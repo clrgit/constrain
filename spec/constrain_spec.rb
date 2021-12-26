@@ -253,11 +253,11 @@ describe "Constrain" do
 
       describe "a proc" do
         it "accepts a Proc object" do
-          accept sym, lambda { |val| val.is_a?(Symbol) }
-          reject str, lambda { |val| val.is_a?(Symbol) }
+          accept int, lambda { |val| val.is_a?(Integer) }
+          reject str, lambda { |val| val.is_a?(Integer) }
 
-          accept [sym], [lambda { |val| val.is_a?(Symbol) }]
-          reject [str], lambda { |val| val.is_a?(Symbol) }
+          accept [int], [lambda { |val| val.is_a?(Integer) }]
+          reject [str], [lambda { |val| val.is_a?(Integer) }]
         end
       end
 
