@@ -126,7 +126,7 @@ module Constrain
       when Hash; "{" + expr.map { |k,v| "#{fmt_expr(k)} => #{fmt_expr(v)}" }.join(", ") + "}"
       when Proc; "Proc@#{expr.source_location.first}:#{expr.source_location.last}"
     else
-      raise Error, "Illegal expression: #{expr.inspect}"
+      expr.inspect
     end
   end
 end
