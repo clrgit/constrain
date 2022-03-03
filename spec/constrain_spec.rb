@@ -16,7 +16,7 @@ def reject(value, *expr)
     # :nocov:
     expect(false).to(eq(true), "Expected #{value.inspect} to not match #{expr.map(&:inspect)}.join(', ')")
     # :nocov:
-  rescue Constrain::Error
+  rescue ArgumentError, Constrain::MatchError
     expect(true).to eq true
     true
   end
@@ -66,21 +66,23 @@ describe "Constrain" do
       accept int, Integer, Integer => String, unwind: 2
     end
 
-    context "when sucessful" do
+    context "when successful" do
       it "returns the value" do
         expect(constrain(42, Integer)).to eq 42
+        expect(constrain(:a, :a, :b, :c)).to eq :a
       end
     end
 
     context "when unsuccessful" do
-      it "raises a Constrain::Error exception" do
-        expect { constrain(42, "42") }.to raise_error Constrain::Error
+      it "raises a ArgumentError exception" do
+        expect { constrain(42, "42") }.to raise_error ArgumentError
       end
     end
 
     context "when given a non-matching type" do
       it "raises a Constrain::MatchError exception" do
         expect { constrain(true, Integer) }.to raise_error Constrain::MatchError
+        expect { constrain(42, :a, :b, :c) }.to raise_error Constrain::MatchError
       end
     end
 
@@ -88,8 +90,8 @@ describe "Constrain" do
       it "uses that as the error message for MatchError exceptions" do
         expect { constrain(true, Integer, msg) }.to raise_error Constrain::MatchError, msg
       end
-      it "ignores it for Error exceptions" do
-        expect { constrain(true, msg) }.to raise_error(Constrain::Error) { |args|
+      it "ignores it for ArgumentError exceptions" do
+        expect { constrain(true, msg) }.to raise_error(ArgumentError) { |args|
           args.message != msg
         }
       end
@@ -122,8 +124,8 @@ describe "Constrain" do
     end
     
     context "when given an illegal expr" do
-      it "raises a Constrain::Error exception" do
-        expect { constrain?(true, []) }.to raise_error Constrain::Error
+      it "raises a ArgumentError exception" do
+        expect { constrain?(true, []) }.to raise_error ArgumentError
       end
     end
   end
@@ -144,8 +146,8 @@ describe "Constrain" do
     end
 
     context "when unsuccessful" do
-      it "raises a Constrain::Error exception" do
-        expect { constrain(42, "42") }.to raise_error Constrain::Error
+      it "raises a ArgumentError exception" do
+        expect { constrain(42, "42") }.to raise_error ArgumentError
       end
     end
 
@@ -262,21 +264,16 @@ describe "Constrain" do
       end
 
       context "an illegal expression" do
-        it "raises a Constrain::Error" do
-          expect { Constrain.do_constrain_value? int, [] }.to raise_error Constrain::Error
+        it "raises a ArgumentError" do
+          expect { Constrain.do_constrain_value? int, [] }.to raise_error ArgumentError
         end
       end
     end
   end
 
   describe "::fmt_exprs" do
-    it "formats the expr like #{inspect} but without array markers" do
+    it "formats the expr like #inspect but without array markers" do
       expect(Constrain.fmt_exprs([Integer, String])).to eq "Integer, String"
-    end
-    context "when given an illegal expression" do
-      it "raises a Constrain::Error exception" do
-        expect { Constrain.fmt_exprs([int]) }.to raise_error Constrain::Error
-      end
     end
   end
 
@@ -287,11 +284,6 @@ describe "Constrain" do
     it "except Proc objects are rendered using shortened notation" do
       l = lambda { |value| true }
       expect(Constrain.fmt_expr(l)).to match /^Proc@#{__FILE__}:\d+$/
-    end
-    context "when given an illegal expression" do
-      it "raises a Constrain::Error exception" do
-        expect { Constrain.fmt_expr(int) }.to raise_error Constrain::Error
-      end
     end
   end
 end

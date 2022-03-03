@@ -1,11 +1,8 @@
 require "constrain/version"
 
 module Constrain
-  # Raised on any error
-  class Error < StandardError; end
-
   # Raised if types doesn't match a class expression
-  class MatchError < Error
+  class MatchError < StandardError
     def initialize(value, exprs, msg = nil, unwind: 0)
       super msg || "Expected #{value.inspect} to match #{Constrain.fmt_exprs(exprs)}"
     end
@@ -31,7 +28,7 @@ module Constrain
   #   constrain(value, *values, unwind: 0)
   #
   # Check that value matches one of the class expressions. Raises a
-  # Constrain::Error if the expression is invalid and a Constrain::MatchError if
+  # Constrain::ArgumentError if the expression is invalid and a Constrain::MatchError if
   # the value doesn't match. The exception's backtrace skips :unwind number of
   # entries
   def self.constrain(value, *exprs)
@@ -39,7 +36,7 @@ module Constrain
   end
 
   # Return true if the value matches the class expression. Raises a
-  # Constrain::Error if the expression is invalid
+  # Constrain::ArgumentError if the expression is invalid
   def self.constrain?(value, *exprs)
     do_constrain?(value, *exprs)
   end
@@ -65,10 +62,10 @@ module Constrain
     msg = exprs.pop if exprs.last.is_a?(String)
     
     begin
-      !exprs.empty? or raise Error, "Empty constraint"
+      !exprs.empty? or raise ArgumentError, "Empty constraint"
       exprs.any? { |expr| Constrain.do_constrain_value?(value, expr) } or 
           raise MatchError.new(value, exprs, msg, unwind: unwind)
-    rescue Error => ex
+    rescue ArgumentError, Constrain::MatchError => ex
       ex.set_backtrace(caller[1 + unwind..-1])
       raise
     end
@@ -77,7 +74,7 @@ module Constrain
 
   def self.do_constrain?(value, *exprs)
     begin
-      !exprs.empty? or raise Error, "Empty constraint"
+      !exprs.empty? or raise ArgumentError, "Empty constraint"
       exprs.any? { |expr| Constrain.do_constrain_value?(value, expr) }
     end
   end
@@ -87,7 +84,7 @@ module Constrain
       when Class, Module
         value.is_a?(expr)
       when Array
-        !expr.empty? or raise Error, "Empty array in constraint"
+        !expr.empty? or raise ArgumentError, "Empty array in constraint"
         value.is_a?(Array) && value.all? { |elem| expr.any? { |e| Constrain.constrain?(elem, e) } }
       when Hash
         value.is_a?(Hash) && value.all? { |key, value|
@@ -117,7 +114,6 @@ module Constrain
 
   # Render a class expression as a String. Same as +expr.inspect+ except that
   # Proc objects are rendered as "Proc@<sourcefile>>:<linenumber>"
-  #
   def self.fmt_expr(expr)
     case expr
       when Class, Module; expr.to_s
