@@ -47,16 +47,17 @@ have it available in all child classes
 
 ## Methods
 
-#### constrain(value, \*expressions, message = nil, unwind: 0)
+#### constrain(value, \*expressions, message: nil, unwind: 0)
 
 Return the given value if it matches at least one of the expressions and raise a
 Constrain::TypeError if not. The value is matched against the expressions using
 the #=== operator so anything you can put into the 'when' clause of a 'case'
 statement can be used. #constrain raise a Constrain::MatchError if the value
-doesn't match any expression 
+doesn't match any expression and an ArgumentError if there is a syntax error in
+the expression 
 
-The error message can be customized by added the message argument and a number
-of backtrace leves can be skipped by setting :unwind option. By default the
+The error message can be customized by adding the message option and a number
+of backtrace leves can be skipped using the :unwind option. By default the
 backtrace will refer to the point of the call of \#constrain. \#constrain
 raises a Constrain::Error exception if there is an error in the syntax of the
 class expression
@@ -65,9 +66,8 @@ class expression
 want an exception if the parameters doesn't match the expected, but because it
 returns the value if successful it can be used to check the validity of
 variables in expressions too, eg. `return constrain(result_of_complex_computation, Integer)` 
-to check the return value of a method
 
-#### Constrain.constrain(value, \*expressions, message = nil, unwind: 0)
+#### Constrain.constrain(value, \*expressions, message: nil, unwind: 0)
 
 Class method version of #constrain. It is automatically added to classes that
 include Constrain
@@ -77,8 +77,8 @@ include Constrain
 
 It matches value against the class expressions like #constrain but returns true
 or false as result. It is automatically added to classes that include
-Constrain. Constrain.constrain? raises a Constrain::Error exception if there
-is an error in the syntax of the class expression
+Constrain. Constrain.constrain? raises a ArgumentError exception if there
+is an error in the syntax of the expression
 
 
 ## Expressions
