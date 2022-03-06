@@ -3,8 +3,8 @@ require "constrain/version"
 module Constrain
   # Raised if types doesn't match a class expression
   class MatchError < StandardError
-    def initialize(value, exprs, msg = nil, unwind: 0)
-      super msg || "Expected #{value.inspect} to match #{Constrain.fmt_exprs(exprs)}"
+    def initialize(value, exprs, message: nil, unwind: 0)
+      super message || "Expected #{value.inspect} to match #{Constrain.fmt_exprs(exprs)}"
     end
   end
 
@@ -28,7 +28,7 @@ module Constrain
   #   constrain(value, *values, unwind: 0)
   #
   # Check that value matches one of the class expressions. Raises a
-  # Constrain::ArgumentError if the expression is invalid and a Constrain::MatchError if
+  # ArgumentError if the expression is invalid and a Constrain::MatchError if
   # the value doesn't match. The exception's backtrace skips :unwind number of
   # entries
   def self.constrain(value, *exprs)
@@ -36,14 +36,16 @@ module Constrain
   end
 
   # Return true if the value matches the class expression. Raises a
-  # Constrain::ArgumentError if the expression is invalid
+  # ArgumentError if the expression is invalid
   def self.constrain?(value, *exprs)
     do_constrain?(value, *exprs)
   end
 
   module ClassMethods
     # See Constrain.constrain
-    def constrain(*args) Constrain.do_constrain(*args) end
+    def constrain(*args) 
+
+    Constrain.do_constrain(*args) end
 
     # See Constrain.constrain?
     def constrain?(*args) Constrain.do_constrain?(*args) end
@@ -55,16 +57,17 @@ module Constrain
   def self.do_constrain(value, *exprs)
     if exprs.last.is_a?(Hash)
       unwind = (exprs.last.delete(:unwind) || 0) + 1
-      !exprs.last.empty? or exprs.pop
+      message = exprs.last.delete(:message)
+      !exprs.last.empty? or exprs.pop # Remove option hash if empty
     else
       unwind = 1
+      message = nil
     end
-    msg = exprs.pop if exprs.last.is_a?(String)
     
     begin
       !exprs.empty? or raise ArgumentError, "Empty constraint"
       exprs.any? { |expr| Constrain.do_constrain_value?(value, expr) } or 
-          raise MatchError.new(value, exprs, msg, unwind: unwind)
+          raise MatchError.new(value, exprs, message: message, unwind: unwind)
     rescue ArgumentError, Constrain::MatchError => ex
       ex.set_backtrace(caller[1 + unwind..-1])
       raise

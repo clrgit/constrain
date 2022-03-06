@@ -46,7 +46,7 @@ describe "Constrain" do
     it "accepts a sequence of simple values" do
       accept(:yellow, :red, :yellow, :green)
       reject(:blue, :red, :yellow, :green)
-      accept("YELLOW", "RED", "YELLOW", "GREEN")
+      accept("GREEN", "RED", "YELLOW", "GREEN")
       reject("BLUE", "RED", "YELLOW", "GREEN")
     end
 
@@ -76,8 +76,8 @@ describe "Constrain" do
     end
 
     context "when unsuccessful" do
-      it "raises a ArgumentError exception" do
-        expect { constrain(42, "42") }.to raise_error ArgumentError
+      it "raises a Constrain::MatchError exception" do
+        expect { constrain(42, "42") }.to raise_error Constrain::MatchError
       end
     end
 
@@ -88,12 +88,12 @@ describe "Constrain" do
       end
     end
 
-    context "when given the optional msg argument" do
+    context "when given the optional :message option" do
       it "uses that as the error message for MatchError exceptions" do
-        expect { constrain(true, Integer, msg) }.to raise_error Constrain::MatchError, msg
+        expect { constrain(true, Integer, message: msg) }.to raise_error Constrain::MatchError, msg
       end
       it "ignores it for ArgumentError exceptions" do
-        expect { constrain(true, msg) }.to raise_error(ArgumentError) { |args|
+        expect { constrain(true, message: msg) }.to raise_error(ArgumentError) { |args|
           args.message != msg
         }
       end
@@ -116,6 +116,14 @@ describe "Constrain" do
           expect(e.backtrace[0]).to eq backtrace[0]
         }
       end
+      it "use :message if present" do
+        expect {
+          constrain 0, 42, message: "Wrong answer"
+        }.to raise_error { |e|
+          expect(e.message).to eq "Wrong answer"
+        }
+      end
+
     end
   end
 
@@ -148,8 +156,8 @@ describe "Constrain" do
     end
 
     context "when unsuccessful" do
-      it "raises a ArgumentError exception" do
-        expect { constrain(42, "42") }.to raise_error ArgumentError
+      it "raises a Constrain::MatchError exception" do
+        expect { constrain(42, "42") }.to raise_error Constrain::MatchError
       end
     end
 
