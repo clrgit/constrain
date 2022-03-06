@@ -46,6 +46,8 @@ describe "Constrain" do
     it "accepts a sequence of simple values" do
       accept(:yellow, :red, :yellow, :green)
       reject(:blue, :red, :yellow, :green)
+      accept("YELLOW", "RED", "YELLOW", "GREEN")
+      reject("BLUE", "RED", "YELLOW", "GREEN")
     end
 
     it "accepts regular expressions as simple values" do
