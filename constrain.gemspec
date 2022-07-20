@@ -27,7 +27,6 @@ Gem::Specification.new do |spec|
     Constrain works with ruby-2 (and maybe ruby-3)
   }
   spec.homepage      = "https://github.com/clrgit/constrain/"
-  spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
 
   spec.metadata["homepage_uri"] = spec.homepage
 
