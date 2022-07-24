@@ -1,4 +1,5 @@
 
+o Match ranges and regular expressions
 o A tuple method: "Symbol => constrain.tuple(String, Integer)"
 o An array and hash method: "Symbol => constrain.array(Integer), String => constrain.hash(Symbol, Integer)"
 o Class | Class syntax
