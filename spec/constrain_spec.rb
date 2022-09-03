@@ -38,6 +38,10 @@ describe "Constrain" do
 
 
   describe "#constrain" do
+    it "accepts a single expression" do
+      accept(true)
+    end
+
     it "accepts a sequence of class expressions" do
       accept(int, Integer)
       accept(int, Integer, String)
@@ -70,6 +74,7 @@ describe "Constrain" do
 
     context "when successful" do
       it "returns the value" do
+        expect(true). to eq true
         expect(constrain(42, Integer)).to eq 42
         expect(constrain(:a, :a, :b, :c)).to eq :a
       end
@@ -77,6 +82,7 @@ describe "Constrain" do
 
     context "when unsuccessful" do
       it "raises a Constrain::MatchError exception" do
+        expect { constrain(false) }.to raise_error Constrain::MatchError
         expect { constrain(42, "42") }.to raise_error Constrain::MatchError
       end
     end
@@ -93,7 +99,7 @@ describe "Constrain" do
         expect { constrain(true, Integer, message: msg) }.to raise_error Constrain::MatchError, msg
       end
       it "ignores it for ArgumentError exceptions" do
-        expect { constrain(true, message: msg) }.to raise_error(ArgumentError) { |args|
+        expect { constrain([], [], message: msg) }.to raise_error(ArgumentError) { |args|
           args.message != msg
         }
       end
@@ -141,8 +147,7 @@ describe "Constrain" do
   end
 
   describe "::do_constrain_value?" do
-    it "expects a non-empty expr" do
-      reject(str)
+    it "expects an empty expr" do
       reject(str, [])
     end
 

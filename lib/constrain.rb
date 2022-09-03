@@ -65,9 +65,12 @@ module Constrain
     end
     
     begin
-      !exprs.empty? or raise ArgumentError, "Empty constraint"
-      exprs.any? { |expr| Constrain.do_constrain_value?(value, expr) } or 
-          raise MatchError.new(value, exprs, message: message, unwind: unwind)
+      if exprs.empty?
+        value or raise MatchError.new(value, [], message: message, unwind: unwind)
+      else
+        exprs.any? { |expr| Constrain.do_constrain_value?(value, expr) } or 
+            raise MatchError.new(value, exprs, message: message, unwind: unwind)
+      end
     rescue ArgumentError, Constrain::MatchError => ex
       ex.set_backtrace(caller[1 + unwind..-1])
       raise
