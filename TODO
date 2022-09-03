@@ -1,11 +1,15 @@
 
-o Allow 'constrain SomeClass < SomeOtherClass'
+o Use | to create class-or expressions
+  o Old: Class | Class syntax
+o Use & to construct tuple expressions
+  o Old: A tuple method: "Symbol => constrain.tuple(String, Integer)"
+o Better error message for 'constrain EXPR'
+o Explain that 'constrain EXPR' can be used for 'constrain SomeClass < AnotherClass'
 o Match ranges and regular expressions
-o A tuple method: "Symbol => constrain.tuple(String, Integer)"
 o An array and hash method: "Symbol => constrain.array(Integer), String => constrain.hash(Symbol, Integer)"
-o Class | Class syntax
 o Constrained attributes: constrain_reader, constrain_writer, constrain_accessor: 
 o Messages should include info about the unexpected element type in arrays (and maybe more): "Expected [#<PgGraph::Data::Record:public.pings[1] {id: 1, name: 'Ping A'}>, #<PgGraph::Data::Record:public.pings[2] {id: 2, name: 'Ping B'}>, nil] to match [PgGraph::Data::Record]
 
 + constrain value, class-expr, "Error message"
 + Check against values: 'constrain arg, :one_value, :another_value, 1, 2, 3'
++ Allow 'constrain EXRP'
