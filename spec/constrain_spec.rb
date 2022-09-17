@@ -47,6 +47,17 @@ describe "Constrain" do
       accept(int, Integer, String)
     end
 
+    it "use the === operator to compare values with classes" do
+       klass =
+          Class.new {
+            @called = false
+            def self.===(other) = @called = true
+            def self.called? = @called
+          }  
+      accept(int, klass)
+      expect(klass.called?).to eq true
+    end
+
     it "accepts a sequence of simple values" do
       accept(:yellow, :red, :yellow, :green)
       reject(:blue, :red, :yellow, :green)

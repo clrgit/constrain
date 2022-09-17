@@ -88,7 +88,7 @@ module Constrain
   def self.do_constrain_value?(value, expr)
     case expr
       when Class, Module
-        value.is_a?(expr)
+        expr === value
       when Array
         !expr.empty? or raise ArgumentError, "Empty array in constraint"
         value.is_a?(Array) && value.all? { |elem| expr.any? { |e| Constrain.constrain?(elem, e) } }
