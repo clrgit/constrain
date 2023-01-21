@@ -12,17 +12,6 @@ module Constrain
     base.extend ClassMethods
   end
 
-  # See Constrain.constrain
-  def constrain(value, *exprs)
-    Constrain.do_constrain(value, *exprs)
-  end
-
-  # Like #constrain but returns true/false to indicate the result instead of
-  # raising an exception
-  def constrain?(value, *exprs)
-    Constrain.do_constrain?(value, *exprs)
-  end
-
   # :call-seq:
   #   constrain(value, *class-expressions, unwind: 0)
   #   constrain(value, *values, unwind: 0)
@@ -35,17 +24,25 @@ module Constrain
     do_constrain(value, *exprs)
   end
 
-  # Return true if the value matches the class expression. Raises a
-  # ArgumentError if the expression is invalid
+  # See Constrain.constrain
+  def constrain(value, *exprs)
+    Constrain.do_constrain(value, *exprs)
+  end
+
+  # Like #constrain but returns true/false to indicate the result instead of
+  # raising an exception
   def self.constrain?(value, *exprs)
     do_constrain?(value, *exprs)
   end
 
+  # See Constrain.constrain?
+  def constrain?(value, *exprs)
+    Constrain.do_constrain?(value, *exprs)
+  end
+
   module ClassMethods
     # See Constrain.constrain
-    def constrain(*args) 
-
-    Constrain.do_constrain(*args) end
+    def constrain(*args) Constrain.do_constrain(*args) end
 
     # See Constrain.constrain?
     def constrain?(*args) Constrain.do_constrain?(*args) end
