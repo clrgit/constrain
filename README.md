@@ -258,7 +258,7 @@ corrupted data
 
 Constrain can be used to type-check complex structures like YAML documents:
 
-ruby```
+```ruby
 value = {
   "mandatory" => "a",
   "optional" => "b",
