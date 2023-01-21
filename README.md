@@ -278,6 +278,7 @@ type = {
     "key2" => [String, Integer]
   }
 }
+
 puts constrain?(value, type) ? "yes" : "no"    # Outputs 'yes'
 value["str"] = 42
 puts constrain?(value, type) ? "yes" : "no"    # Outputs 'no'
