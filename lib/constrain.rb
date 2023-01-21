@@ -3,8 +3,12 @@ require "constrain/version"
 module Constrain
   # Raised if types doesn't match a class expression
   class MatchError < StandardError
-    def initialize(value, exprs, message: nil, unwind: 0)
-      super message || "Expected #{value.inspect} to match #{Constrain.fmt_exprs(exprs)}"
+    def initialize(value, exprs, message: nil, unwind: 0, not_argument: false, not_value: nil)
+      if not_argument
+        super message || "Expected #{value.inspect} to not equal #{not_value.inspect}"
+      else
+        super message || "Expected #{value.inspect} to match #{Constrain.fmt_exprs(exprs)}"
+      end
     end
   end
 
@@ -20,46 +24,41 @@ module Constrain
   # ArgumentError if the expression is invalid and a Constrain::MatchError if
   # the value doesn't match. The exception's backtrace skips :unwind number of
   # entries
-  def self.constrain(value, *exprs)
-    do_constrain(value, *exprs)
+  def self.constrain(value, *exprs, **opts)
+    do_constrain(value, *exprs, **opts)
   end
 
   # See Constrain.constrain
-  def constrain(value, *exprs)
-    Constrain.do_constrain(value, *exprs)
-  end
+  def constrain(...) = Constrain.do_constrain(...)
 
   # Like #constrain but returns true/false to indicate the result instead of
   # raising an exception
-  def self.constrain?(value, *exprs)
-    do_constrain?(value, *exprs)
+  def self.constrain?(value, *exprs, **opts)
+    do_constrain?(value, *exprs, **opts)
   end
 
   # See Constrain.constrain?
-  def constrain?(value, *exprs)
-    Constrain.do_constrain?(value, *exprs)
-  end
+  def constrain?(...) = Constrain.do_constrain?(...)
 
   module ClassMethods
     # See Constrain.constrain
-    def constrain(*args) Constrain.do_constrain(*args) end
+    def constrain(...) Constrain.do_constrain(...) end
 
     # See Constrain.constrain?
-    def constrain?(*args) Constrain.do_constrain?(*args) end
+    def constrain?(...) Constrain.do_constrain?(...) end
   end
 
+  # :call-seq:
+  #   do_constrain(value, *exprs, unwind: 0, message: nil, not: nil)
+  #
   # unwind is automatically incremented by one because ::do_constrain is always
   # called from one of the other constrain methods
   #
-  def self.do_constrain(value, *exprs)
-    if exprs.last.is_a?(Hash)
-      unwind = (exprs.last.delete(:unwind) || 0) + 1
-      message = exprs.last.delete(:message)
-      !exprs.last.empty? or exprs.pop # Remove option hash if empty
-    else
-      unwind = 1
-      message = nil
-    end
+  def self.do_constrain(value, *exprs, unwind: 0, message: nil, **opts)
+    opts.keys.empty? || opts.keys == [:not] or raise ArgumentError
+    unwind += 1
+    not_argument = opts.key?(:not)
+    not_value = opts[:not]
     
     begin
       if exprs.empty?
@@ -68,6 +67,10 @@ module Constrain
         exprs.any? { |expr| Constrain.do_constrain_value?(value, expr) } or 
             raise MatchError.new(value, exprs, message: message, unwind: unwind)
       end
+      !not_argument || value != not_value or 
+          raise MatchError.new(
+              value, exprs, message: message, unwind: unwind, not_argument: true, not_value: not_value)
+        
     rescue ArgumentError, Constrain::MatchError => ex
       ex.set_backtrace(caller[1 + unwind..-1])
       raise
@@ -75,11 +78,13 @@ module Constrain
     value
   end
 
-  def self.do_constrain?(value, *exprs)
+  def self.do_constrain?(...)
     begin
-      !exprs.empty? or raise ArgumentError, "Empty constraint"
-      exprs.any? { |expr| Constrain.do_constrain_value?(value, expr) }
+      do_constrain(...)
+    rescue MatchError
+      return false
     end
+    true
   end
 
   def self.do_constrain_value?(value, expr)

@@ -36,7 +36,6 @@ describe "Constrain" do
     expect(Constrain::VERSION).not_to be_nil
   end
 
-
   describe "#constrain" do
     it "accepts a single expression" do
       accept(true)
@@ -83,6 +82,14 @@ describe "Constrain" do
       accept int, Integer, Integer => String, unwind: 2
     end
 
+    it "accepts a :message option" do
+      accept int, Integer, message: "this worked"
+    end
+
+    it "accepts a :not option" do
+      accept int, Integer, message: "this worked"
+    end
+
     context "when successful" do
       it "returns the value" do
         expect(true). to eq true
@@ -105,7 +112,14 @@ describe "Constrain" do
       end
     end
 
-    context "when given the optional :message option" do
+    context "when given a :not option" do
+      it "raises if it is equal to the value" do
+        expect { constrain(42, Integer, not: 40) }.not_to raise_error
+        expect { constrain(42, Integer, not: 42) }.to raise_error Constrain::MatchError
+      end
+    end
+
+    context "when given a :message option" do
       it "uses that as the error message for MatchError exceptions" do
         expect { constrain(true, Integer, message: msg) }.to raise_error Constrain::MatchError, msg
       end
@@ -140,7 +154,6 @@ describe "Constrain" do
           expect(e.message).to eq "Wrong answer"
         }
       end
-
     end
   end
 
