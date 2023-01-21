@@ -260,26 +260,27 @@ Constrain can be used to type-check complex structures like YAML documents:
 
 ```ruby
 value = {
-  "mandatory" => "a",
-  "optional" => "b",
-  "command" => {
-    "backup" => "c",
-    "list" => "d"
+  "str" => "a",
+  "int" => 42,
+  "arr" => [1, 2],
+  "hash" => {
+    "key1" => "b",
+    "key2" => 42
   }
 }
 
 type = {
-  "mandatory" => String,
-  "optional" => String,
-  "command" => {
-    "backup" => String,
-    "list" => String
+  "str" => String,
+  "int" => Integer,
+  "arr" => [Integer],
+  "hash" => {
+    "key1" => [String, Integer],
+    "key2" => [String, Integer]
   }
 }
-
-puts constrain?(v, t) ? "yes" : "no"    # Outputs 'yes'
-v["mandatory"] = 42
-puts constrain?(v, t) ? "yes" : "no"    # Outputs 'no'
+puts constrain?(value, type) ? "yes" : "no"    # Outputs 'yes'
+value["str"] = 42
+puts constrain?(value, type) ? "yes" : "no"    # Outputs 'no'
 ```
 
 ## Installation
