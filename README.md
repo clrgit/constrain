@@ -22,7 +22,7 @@ f("Hello", "world")   # Boom
 It is intended to be an aid in development only and to be deactivated in
 production (TODO: Make it possible to deactivate)
 
-Constrain works with ruby-2 (and maybe ruby-3)
+Constrain works with ruby-3
 
 ## Usage
 
@@ -42,8 +42,17 @@ def f(a, b, c)
 end
 ```
 
-The alternative is to include the constrain Module in a common root class to
-have it available in all child classes
+Constrain only defines the methods \#constrain and \#constrain? so it is
+acceptible in most cases. An alternative is to include the constrain module
+in a common root class to have it available in all child classes:
+
+```ruby
+  class BaseClass
+    include Constrain
+    ...
+  end
+```
+
 
 ## Methods
 
@@ -244,6 +253,34 @@ should not overuse it because as checks becomes more complex they tend to
 include business logic that should be kept in the production code. Constrain is
 only thouhgt of as a tool to catch developer errors - not errors that stem from
 corrupted data
+
+## Other uses
+
+Constrain can be used to type-check complex structures like YAML documents:
+
+ruby```
+value = {
+  "mandatory" => "a",
+  "optional" => "b",
+  "command" => {
+    "backup" => "c",
+    "list" => "d"
+  }
+}
+
+type = {
+  "mandatory" => String,
+  "optional" => String,
+  "command" => {
+    "backup" => String,
+    "list" => String
+  }
+}
+
+puts constrain?(v, t) ? "yes" : "no"    # Outputs 'yes'
+v["mandatory"] = 42
+puts constrain?(v, t) ? "yes" : "no"    # Outputs 'no'
+```
 
 ## Installation
 
