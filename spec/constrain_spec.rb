@@ -1,7 +1,7 @@
 
-def accept(value, *expr)
+def accept(value, ...)
   begin
-    constrain(value, *expr)
+    constrain(value, ...)
     expect(true).to eq true
     # :nocov:
   rescue Constrain::MatchError => ex
@@ -10,11 +10,11 @@ def accept(value, *expr)
   end
 end
 
-def reject(value, *expr)
+def reject(value, ...)
   begin
-    constrain(value, *expr)
+    constrain(value, ...)
     # :nocov:
-    expect(false).to(eq(true), "Expected #{value.inspect} to not match #{expr.map(&:inspect)}.join(', ')")
+    expect(false).to eq true
     # :nocov:
   rescue ArgumentError, Constrain::MatchError
     expect(true).to eq true
@@ -37,12 +37,20 @@ describe "Constrain" do
   end
 
   describe "#constrain" do
-    it "accepts a single expression" do
+    it "accepts an absent expression" do
       accept(true)
     end
 
-    it "accepts a sequence of class expressions" do
+
+    it "accepts a class expression" do
       accept(int, Integer)
+    end
+
+    it "accepts a hash class expression" do
+      accept({}, { String => [Integer, NilClass] })
+    end
+
+    it "accepts a sequence of class expressions" do
       accept(int, Integer, String)
     end
 
@@ -78,15 +86,11 @@ describe "Constrain" do
 
     it "accepts a :unwind option" do
       accept int, Integer, unwind: 2
-      accept({int => str}, Integer => String, unwind: 2)
-      accept int, Integer, Integer => String, unwind: 2
+      accept({int => str}, { Integer => String }, unwind: 2)
+      accept int, Integer, { Integer => String }, unwind: 2
     end
 
     it "accepts a :message option" do
-      accept int, Integer, message: "this worked"
-    end
-
-    it "accepts a :not option" do
       accept int, Integer, message: "this worked"
     end
 
@@ -109,13 +113,6 @@ describe "Constrain" do
       it "raises a Constrain::MatchError exception" do
         expect { constrain(true, Integer) }.to raise_error Constrain::MatchError
         expect { constrain(42, :a, :b, :c) }.to raise_error Constrain::MatchError
-      end
-    end
-
-    context "when given a :not option" do
-      it "raises if it is equal to the value" do
-        expect { constrain(42, Integer, not: 40) }.not_to raise_error
-        expect { constrain(42, Integer, not: 42) }.to raise_error Constrain::MatchError
       end
     end
 
@@ -251,44 +248,44 @@ describe "Constrain" do
 
       describe "a hash" do
         it "accepts an expr for the key" do
-          accept({ sym => int }, Symbol => Integer)
-          reject({ sym => str }, Symbol => Integer)
-          reject({ str => int }, Symbol => Integer)
-          reject({ [sym] => int }, Symbol => Integer)
+          accept({ sym => int }, { Symbol => Integer })
+          reject({ sym => str }, { Symbol => Integer })
+          reject({ str => int }, { Symbol => Integer })
+          reject({ [sym] => int }, { Symbol => Integer })
 
-          accept({ [sym] => int }, [Symbol] => Integer)
-          reject({ sym => int }, [Symbol] => Integer)
-          reject({ [str] => int }, [Symbol] => Integer)
+          accept({ [sym] => int }, { [Symbol] => Integer })
+          reject({ sym => int }, { [Symbol] => Integer })
+          reject({ [str] => int }, { [Symbol] => Integer })
         end
 
         it "accepts a list of exprs for the key" do
-          accept({ sym => int }, [Symbol, String] => Integer)
-          accept({ str => int }, [Symbol, String] => Integer)
-          reject({ int => int }, [Symbol, String] => Integer)
-          reject({ [str] => int }, [Symbol, String] => Integer)
+          accept({ sym => int }, { [Symbol, String] => Integer })
+          accept({ str => int }, { [Symbol, String] => Integer })
+          reject({ int => int }, { [Symbol, String] => Integer })
+          reject({ [str] => int }, { [Symbol, String] => Integer })
 
-          accept({ [sym] => int }, [[Symbol, String]] => Integer)
-          accept({ [str] => int }, [[Symbol, String]] => Integer)
-          reject({ [[str]] => int }, [[Symbol, String]] => Integer)
+          accept({ [sym] => int }, { [[Symbol, String]] => Integer })
+          accept({ [str] => int }, { [[Symbol, String]] => Integer })
+          reject({ [[str]] => int }, { [[Symbol, String]] => Integer })
         end
 
         it "accepts an expr for the value" do
-          accept({ sym => int }, Symbol => Integer)
-          reject({ sym => str }, Symbol => Integer)
+          accept({ sym => int }, { Symbol => Integer })
+          reject({ sym => str }, { Symbol => Integer })
 
-          accept({ sym => [int] }, Symbol => [Integer])
-          reject({ sym => int }, Symbol => [Integer])
-          reject({ sym => [str] }, Symbol => [Integer])
+          accept({ sym => [int] }, { Symbol => [Integer] })
+          reject({ sym => int }, { Symbol => [Integer] })
+          reject({ sym => [str] }, { Symbol => [Integer] })
         end
 
         it "accepts cases for the value" do
-          accept({ sym => int }, Symbol => [String, Integer])
-          accept({ sym => str }, Symbol => [String, Integer])
-          reject({ sym => [int] }, Symbol => [String, Integer])
-          reject({ sym => [str] }, Symbol => [String, Integer])
+          accept({ sym => int }, { Symbol => [String, Integer] })
+          accept({ sym => str }, { Symbol => [String, Integer] })
+          reject({ sym => [int] }, { Symbol => [String, Integer] })
+          reject({ sym => [str] }, { Symbol => [String, Integer] })
 
-          accept({ sym => [int] }, Symbol => [[String, Integer]])
-          reject({ sym => [[int]] }, Symbol => [[String, Integer]])
+          accept({ sym => [int] }, { Symbol => [[String, Integer]] })
+          reject({ sym => [[int]] }, { Symbol => [[String, Integer]] })
         end
       end
 

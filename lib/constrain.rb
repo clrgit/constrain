@@ -54,12 +54,8 @@ module Constrain
   # unwind is automatically incremented by one because ::do_constrain is always
   # called from one of the other constrain methods
   #
-  def self.do_constrain(value, *exprs, unwind: 0, message: nil, **opts)
-    opts.keys.empty? || opts.keys == [:not] or raise ArgumentError
+  def self.do_constrain(value, *exprs, unwind: 0, message: nil)
     unwind += 1
-    not_argument = opts.key?(:not)
-    not_value = opts[:not]
-    
     begin
       if exprs.empty?
         value or raise MatchError.new(value, [], message: message, unwind: unwind)
@@ -67,10 +63,6 @@ module Constrain
         exprs.any? { |expr| Constrain.do_constrain_value?(value, expr) } or 
             raise MatchError.new(value, exprs, message: message, unwind: unwind)
       end
-      !not_argument || value != not_value or 
-          raise MatchError.new(
-              value, exprs, message: message, unwind: unwind, not_argument: true, not_value: not_value)
-        
     rescue ArgumentError, Constrain::MatchError => ex
       ex.set_backtrace(caller[1 + unwind..-1])
       raise

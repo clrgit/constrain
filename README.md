@@ -35,9 +35,9 @@ require 'constrain'
 include Constrain
 
 def f(a, b, c)
-  constrain a, Integer                      # An integer
-  constrain b, [Symbol, String] => Integer  # Hash with String or Symbol keys
-  constrain c, [String], NilClass           # Array of strings or nil
+  constrain a, Integer                         # An integer
+  constrain b, { [Symbol, String] => Integer } # Hash with String or Symbol keys
+  constrain c, [String], NilClass              # Array of strings or nil
   ...
 end
 ```
@@ -112,11 +112,11 @@ Simple values are compared to the expected result using the #=== operator. This
 means you can use regular expressions too:
 
 ```ruby
-# Simple email regular expression (https://stackoverflow.com/a/719543)
-EMAIL_RE = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9.-]+$/
+# Simple (!) email address regular expression (https://stackoverflow.com/a/719543)
+EMAIL_ADDRESS_RE = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9.-]+$/
 
-def email(address)
-  constrain address, EMAIL_RE
+def send_email(address)
+  constrain address, EMAIL_ADDRESS_RE
   ...
 end
 ```
@@ -173,8 +173,8 @@ Hashes match if value is a hash and every key/value pair match one of the given
 key-class/value-class expressions:
 
 ```ruby
-constrain({"str" => 42}, String => Integer)   # Success
-constrain({"str" => 42}, String => String)    # Failure
+constrain({"str" => 42}, { String => Integer })   # Success
+constrain({"str" => 42}, { String => String })    # Failure
 ```
 
 Note that the parenthesis are needed because otherwise the Ruby parser would
@@ -186,15 +186,15 @@ element so that `[String, Symbol]` matches either a String or a Symbol value
 while `[String]` matches an array of String objects:
 
 ```ruby
-constrain({ sym: 42 }, [Symbol, String] => Integer)       # Success
-constrain({ [sym] => 42 }, [Symbol, String] => Integer)   # Failure
+constrain({ sym: 42 }, { [Symbol, String] => Integer })       # Success
+constrain({ [sym] => 42 }, { [Symbol, String] => Integer })   # Failure
 ```
 
 To specify an array of Symbol or String objects in hash keys or values, make
 sure the list expression is enclosed in an array:
 
 ```ruby
-constrain({ [sym] => 42 }, [[Symbol, String]] => Integer)   # Success
+constrain({ [sym] => 42 }, { [[Symbol, String]] => Integer })   # Success
 ```
 
 #### nil, true and false
@@ -259,6 +259,7 @@ corrupted data
 Constrain can be used to type-check complex structures like YAML documents:
 
 ```ruby
+# A YAML value
 value = {
   "str" => "a",
   "int" => 42,
@@ -269,6 +270,7 @@ value = {
   }
 }
 
+# Type description
 type = {
   "str" => String,
   "int" => Integer,
