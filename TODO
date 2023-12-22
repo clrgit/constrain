@@ -1,4 +1,5 @@
 
+o An Enumerable#constrain method: select { |elem| constraint.constrain?(elem) }
 o A constrain_class method that allows for inherited-from tests
 o Allow single-argument boolean expressions: 'constrain !a.empty?'
 o This seems to cause a stack error: 'constrain some-hash, Symbol'
