@@ -206,8 +206,9 @@ constrain nil, Integer             # Failure
 constrain nil, Integer, NilClass   # Success
 ```
 
-Boolean values are a special case since ruby doesn't have a boolean type use a
-list to match for a boolean argument:
+Boolean values are a special case since ruby doesn't have a boolean type, so
+use a list of true/false or their corresponding classes to match for a boolean
+argument:
 
 ```ruby
 constrain true, TrueClass, FalseClass   # Success
